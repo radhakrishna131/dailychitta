@@ -38,8 +38,8 @@ export function UploadPaymentDialog({ loanId, defaultAmount, trigger, onDone }: 
         const path = `${user.id}/${loanId}/${Date.now()}.${ext}`;
         const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, file);
         if (upErr) throw upErr;
-        const { data } = supabase.storage.from("payment-proofs").getPublicUrl(path);
-        proof_url = data.publicUrl;
+        // Store the storage path; generate signed URLs on demand (bucket is private)
+        proof_url = path;
       }
       const { error } = await supabase.from("payments").insert({
         loan_id: loanId,

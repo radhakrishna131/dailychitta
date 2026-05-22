@@ -74,9 +74,23 @@ function History() {
                 </div>
                 <div className="flex items-center gap-3">
                   {p.proof_url && (
-                    <a href={p.proof_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-accent hover:underline">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        let path = p.proof_url as string;
+                        const marker = "/payment-proofs/";
+                        const idx = path.indexOf(marker);
+                        if (idx !== -1) path = path.slice(idx + marker.length);
+                        const { data, error } = await supabase.storage
+                          .from("payment-proofs")
+                          .createSignedUrl(path, 60);
+                        if (error || !data?.signedUrl) return;
+                        window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+                      }}
+                      className="flex items-center gap-1 text-xs text-accent hover:underline"
+                    >
                       <FileText className="size-3.5" /> Proof <ExternalLink className="size-3" />
-                    </a>
+                    </button>
                   )}
                   <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-medium text-success capitalize">{p.status}</span>
                 </div>
